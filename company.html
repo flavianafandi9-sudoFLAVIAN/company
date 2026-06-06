@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Company Feedback Portal | Departments</title>
+  <!-- Bootstrap 5 CSS + Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Roboto, system-ui;
+    }
+    .navbar-brand i {
+      margin-right: 8px;
+    }
+    .card {
+      border: none;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+    }
+    .comment-card {
+      border-left: 5px solid;
+      border-radius: 16px;
+      margin-bottom: 18px;
+      background: white;
+      transition: 0.2s;
+    }
+    .growth-border {
+      border-left-color: #2b8c4e;
+    }
+    .change-border {
+      border-left-color: #e67e22;
+    }
+    .badge-dept {
+      background-color: #6c757d;
+      font-size: 0.7rem;
+      padding: 5px 10px;
+      border-radius: 30px;
+    }
+    .delete-icon {
+      cursor: pointer;
+      color: #dc3545;
+      transition: 0.2s;
+      font-size: 1.1rem;
+    }
+    .delete-icon:hover {
+      opacity: 0.7;
+      transform: scale(1.05);
+    }
+    .avatar-placeholder {
+      width: 38px;
+      height: 38px;
+      background-color: #0d6efd;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+    .view-transition {
+      animation: fadeIn 0.25s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    footer {
+      font-size: 0.8rem;
+      color: #6c757d;
+      text-align: center;
+      margin-top: 3rem;
+      padding: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark shadow-sm">
+  <div class="container">
+    <span class="navbar-brand fw-bold"><i class="fas fa-chart-line"></i> GrowTogether • Dept Feedback Hub</span>
+    <div id="navUserArea" class="d-flex align-items-center gap-2">
+      <span id="navUserName" class="text-light small d-none d-sm-inline"></span>
+      <button id="logoutBtn" class="btn btn-sm btn-outline-light" style="display: none;"><i class="fas fa-sign-out-alt"></i> Exit</button>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4">
+  <!-- AUTH SECTION (Login / Register) -->
+  <div id="authContainer" class="row justify-content-center">
+    <div class="col-lg-5 col-md-7">
+      <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white border-0 rounded-top-4">
+          <ul class="nav nav-tabs card-header-tabs" id="authTabs" role="tablist">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#loginTab" type="button">🔐 Login</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#registerTab" type="button">📝 Register</button></li>
+          </ul>
+        </div>
+        <div class="card-body p-4">
+          <div class="tab-content">
+            <!-- Login Form -->
+            <div class="tab-pane fade show active" id="loginTab">
+              <form id="loginForm">
+                <div class="mb-3">
+                  <label class="form-label"><i class="fas fa-user"></i> Username</label>
+                  <input type="text" class="form-control" id="loginUsername" placeholder="e.g., jane_eng" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label"><i class="fas fa-lock"></i> Password</label>
+                  <input type="password" class="form-control" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2"><i class="fas fa-arrow-right-to-bracket"></i> Sign in</button>
+              </form>
+            </div>
+            <!-- Register Form -->
+            <div class="tab-pane fade" id="registerTab">
+              <form id="registerForm">
+                <div class="mb-3">
+                  <label class="form-label">Username (unique)</label>
+                  <input type="text" class="form-control" id="regUsername" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Password</label>
+                  <input type="password" class="form-control" id="regPassword" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Department</label>
+                  <select class="form-select" id="regDepartment" required>
+                    <option value="">-- Select --</option>
+                    <option>Engineering</option><option>Sales</option><option>Human Resources</option>
+                    <option>Marketing</option><option>Finance</option><option>Operations</option>
+                    <option>Product</option><option>Customer Support</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-success w-100 py-2"><i class="fas fa-user-plus"></i> Create account</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer bg-transparent text-muted small text-center border-0">
+          <i class="fas fa-shield-alt"></i> Demo – data stored locally in your browser
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP (after login) -->
+  <div id="appContainer" style="display: none;">
+    <div class="row g-4">
+      <!-- Sidebar navigation -->
+      <div class="col-md-3">
+        <div class="list-group shadow-sm rounded-4 overflow-hidden">
+          <button class="list-group-item list-group-item-action active" data-view="dashboard"><i class="fas fa-home"></i> Dashboard</button>
+          <button class="list-group-item list-group-item-action" data-view="newPost"><i class="fas fa-pen-fancy"></i> New Feedback</button>
+          <button class="list-group-item list-group-item-action" data-view="profile"><i class="fas fa-id-card"></i> My Profile</button>
+        </div>
+        <div class="mt-3 p-3 bg-light rounded-4 text-center small text-secondary">
+          <i class="fas fa-comment-dots"></i> Share growth insights or improvement ideas.
+        </div>
+      </div>
+
+      <!-- Dynamic content panels -->
+      <div class="col-md-9">
+        <!-- DASHBOARD: all comments -->
+        <div id="dashboardView" class="view-panel">
+          <div class="card rounded-4">
+            <div class="card-header bg-white border-0 pt-3 pb-0">
+              <h5 class="fw-bold mb-0"><i class="fas fa-globe"></i> Company‑wide feedback</h5>
+              <p class="text-muted small">What colleagues say about growth & change</p>
+            </div>
+            <div class="card-body" id="commentsFeed">
+              <div class="text-center py-5"><div class="spinner-border text-primary"></div> Loading comments...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NEW POST view -->
+        <div id="newPostView" class="view-panel" style="display: none;">
+          <div class="card rounded-4">
+            <div class="card-header bg-white border-0 pt-3">
+              <h5 class="fw-bold"><i class="fas fa-lightbulb"></i> Share your perspective</h5>
+            </div>
+            <div class="card-body">
+              <form id="commentForm">
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Category</label>
+                  <select id="commentCategory" class="form-select" required>
+                    <option value="growth">📈 Company Growth (what's working well)</option>
+                    <option value="change">🔄 What should be changed (areas to improve)</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Your message</label>
+                  <textarea id="commentText" rows="4" class="form-control" placeholder="Be constructive and specific..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-success px-4"><i class="fas fa-paper-plane"></i> Publish feedback</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROFILE view (personal details) -->
+        <div id="profileView" class="view-panel" style="display: none;">
+          <div class="card rounded-4">
+            <div class="card-header bg-white border-0 pt-3">
+              <h5 class="fw-bold"><i class="fas fa-user-circle"></i> My personal information</h5>
+              <p class="text-muted small">Please complete your name & phone before commenting</p>
+            </div>
+            <div class="card-body">
+              <form id="profileDetailsForm">
+                <div class="mb-3">
+                  <label class="form-label">Username</label>
+                  <input type="text" id="profileUsername" class="form-control bg-light" disabled>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Department</label>
+                  <input type="text" id="profileDept" class="form-control bg-light" disabled>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Full name <span class="text-danger">*</span></label>
+                  <input type="text" id="profileFullname" class="form-control" placeholder="e.g., Sarah Johnson">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Phone number <span class="text-danger">*</span></label>
+                  <input type="tel" id="profilePhone" class="form-control" placeholder="+1 234 567 890">
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update details</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer>🔐 Secure demo — All data stored in your browser's localStorage. Your voice matters.</footer>
+</div>
+
+<script>
+  // ---------- STORAGE KEYS ----------
+  const STORAGE_USERS = "company_feedback_users";
+  const STORAGE_COMMENTS = "company_feedback_comments";
+  const SESSION_KEY = "loggedInUserId";
+
+  // ---------- Helper functions ----------
+  function saveUsers(users) { localStorage.setItem(STORAGE_USERS, JSON.stringify(users)); }
+  function loadUsers() { return JSON.parse(localStorage.getItem(STORAGE_USERS)) || []; }
+  function saveComments(comments) { localStorage.setItem(STORAGE_COMMENTS, JSON.stringify(comments)); }
+  function loadComments() { return JSON.parse(localStorage.getItem(STORAGE_COMMENTS)) || []; }
+
+  // Generate simple ID
+  function genId() { return Date.now() + '-' + Math.random().toString(36).substr(2, 6); }
+
+  // initialize demo data if empty
+  function initMockData() {
+    let users = loadUsers();
+    if (users.length === 0) {
+      const defaultUsers = [
+        { id: "u1", username: "alvin_eng", password: "pass123", department: "Engineering", fullName: "Alvin Mbalanya", phone: "+254115123101" },
+        { id: "u2", username: "branto_sales", password: "pass123", department: "Sales", fullName: "Branton Donyi", phone: "+254555 987 654" },
+        { id: "u3", username: "modesta_hr", password: "pass123", department: "Human Resources", fullName: "Modesta Aduka", phone: "+1 555 456 789" }
+      ];
+      saveUsers(defaultUsers);
+      users = defaultUsers;
+    }
+    let comments = loadComments();
+    if (comments.length === 0) {
+      const sampleComments = [
+        { id: "c1", userId: "u1", userName: "Alvin Mbalanya", userDept: "Engineering", userFullName: "Alvin Mbalanya", category: "growth", content: "Great adoption of CI/CD pipelines, release speed increased by 40%!", timestamp: new Date(Date.now() - 86400000).toISOString() },
+        { id: "c2", userId: "u2", userName: "Branton Donyi", userDept: "Sales", userFullName: "Branton Donyi", category: "change", content: "CRM integration needs improvement – too many manual steps.", timestamp: new Date(Date.now() - 172800000).toISOString() },
+        { id: "c3", userId: "u3", userName: "Modesta Aduka", userDept: "Human Resources", userFullName: "Modesta Aduka", category: "growth", content: "New wellness initiative increased employee satisfaction. Keep going!", timestamp: new Date(Date.now() - 43200000).toISOString() }
+      ];
+      saveComments(sampleComments);
+      comments = sampleComments;
+    }
+  }
+
+  // current logged user (object)
+  let currentUser = null;
+
+  // DOM elements
+  const authContainer = document.getElementById('authContainer');
+  const appContainer = document.getElementById('appContainer');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const navUserNameSpan = document.getElementById('navUserName');
+
+  // Show/Hide UI based on auth
+  function renderAuthUI() {
+    authContainer.style.display = 'flex';
+    appContainer.style.display = 'none';
+    currentUser = null;
+    logoutBtn.style.display = 'none';
+    navUserNameSpan.innerText = '';
+  }
+
+  function renderAppUI(user) {
+    currentUser = user;
+    authContainer.style.display = 'none';
+    appContainer.style.display = 'block';
+    logoutBtn.style.display = 'inline-block';
+    navUserNameSpan.innerText = `${user.username} (${user.department})`;
+    // load profile data into form
+    document.getElementById('profileUsername').value = user.username;
+    document.getElementById('profileDept').value = user.department;
+    document.getElementById('profileFullname').value = user.fullName || '';
+    document.getElementById('profilePhone').value = user.phone || '';
+    // load comments feed
+    refreshCommentsFeed();
+    // default view = dashboard
+    switchView('dashboard');
+  }
+
+  // check session on page load
+  function checkSession() {
+    const savedId = localStorage.getItem(SESSION_KEY);
+    if (savedId) {
+      const users = loadUsers();
+      const user = users.find(u => u.id === savedId);
+      if (user) {
+        renderAppUI(user);
+        return;
+      }
+    }
+    renderAuthUI();
+  }
+
+  // login logic
+  function handleLogin(username, password) {
+    const users = loadUsers();
+    const user = users.find(u => u.username === username && u.password === password);
+    if (!user) throw new Error("Invalid username or password");
+    localStorage.setItem(SESSION_KEY, user.id);
+    renderAppUI(user);
+  }
+
+  function handleRegister(username, password, department) {
+    const users = loadUsers();
+    if (users.find(u => u.username === username)) throw new Error("Username already exists");
+    const newUser = {
+      id: genId(),
+      username,
+      password,
+      department,
+      fullName: "",
+      phone: ""
+    };
+    users.push(newUser);
+    saveUsers(users);
+    // auto login after registration
+    localStorage.setItem(SESSION_KEY, newUser.id);
+    renderAppUI(newUser);
+  }
+
+  function logout() {
+    localStorage.removeItem(SESSION_KEY);
+    renderAuthUI();
+  }
+
+  // Update profile details
+  function updateProfile(fullName, phone) {
+    if (!fullName.trim() || !phone.trim()) throw new Error("Full name and phone number are required");
+    const users = loadUsers();
+    const idx = users.findIndex(u => u.id === currentUser.id);
+    if (idx === -1) throw new Error("User not found");
+    users[idx].fullName = fullName.trim();
+    users[idx].phone = phone.trim();
+    saveUsers(users);
+    // update current user object
+    currentUser = users[idx];
+    // update UI profile fields
+    document.getElementById('profileFullname').value = currentUser.fullName;
+    document.getElementById('profilePhone').value = currentUser.phone;
+    // also update navbar name display (only username stays, but no need)
+    navUserNameSpan.innerText = `${currentUser.username} (${currentUser.department})`;
+    // refresh comments because displayed names may change
+    refreshCommentsFeed();
+  }
+
+  // Add new comment
+  function addComment(category, content) {
+    if (!currentUser.fullName || !currentUser.phone) {
+      throw new Error("Please complete your profile (full name & phone) before commenting.");
+    }
+    if (!content.trim()) throw new Error("Comment cannot be empty");
+    const comments = loadComments();
+    const newComment = {
+      id: genId(),
+      userId: currentUser.id,
+      userName: currentUser.username,
+      userDept: currentUser.department,
+      userFullName: currentUser.fullName,
+      category: category,
+      content: content.trim(),
+      timestamp: new Date().toISOString()
+    };
+    comments.unshift(newComment);
+    saveComments(comments);
+    refreshCommentsFeed();
+  }
+
+  function deleteComment(commentId) {
+    let comments = loadComments();
+    const comment = comments.find(c => c.id === commentId);
+    if (!comment || comment.userId !== currentUser.id) throw new Error("Cannot delete this comment");
+    comments = comments.filter(c => c.id !== commentId);
+    saveComments(comments);
+    refreshCommentsFeed();
+  }
+
+  // render all comments in dashboard
+  function refreshCommentsFeed() {
+    const feedContainer = document.getElementById('commentsFeed');
+    const comments = loadComments();
+    if (!comments.length) {
+      feedContainer.innerHTML = `<div class="alert alert-light text-center p-5 rounded-4">✨ No feedback yet. Be the first to share your thoughts!</div>`;
+      return;
+    }
+    feedContainer.innerHTML = '';
+    comments.forEach(comm => {
+      const isGrowth = comm.category === 'growth';
+      const borderClass = isGrowth ? 'growth-border' : 'change-border';
+      const categoryIcon = isGrowth ? '📈' : '🔄';
+      const categoryLabel = isGrowth ? 'Growth' : 'Change needed';
+      const displayName = comm.userFullName || comm.userName;
+      const dateObj = new Date(comm.timestamp);
+      const formattedDate = dateObj.toLocaleString();
+      const canDelete = (currentUser && currentUser.id === comm.userId);
+      
+      const commentDiv = document.createElement('div');
+      commentDiv.className = `comment-card p-3 shadow-sm ${borderClass}`;
+      commentDiv.innerHTML = `
+        <div class="d-flex justify-content-between align-items-start">
+          <div class="flex-grow-1">
+            <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+              <span class="fw-bold"><i class="fas fa-user-circle"></i> ${escapeHtml(displayName)}</span>
+              <span class="badge-dept bg-secondary text-white"><i class="fas fa-building"></i> ${escapeHtml(comm.userDept)}</span>
+              <span class="badge ${isGrowth ? 'bg-success' : 'bg-warning text-dark'}">${categoryIcon} ${categoryLabel}</span>
+            </div>
+            <p class="mb-2" style="white-space: pre-line;">${escapeHtml(comm.content)}</p>
+            <small class="text-muted"><i class="far fa-clock"></i> ${formattedDate}</small>
+          </div>
+          ${canDelete ? `<i class="fas fa-trash-alt delete-icon ms-2" data-id="${comm.id}" title="Remove my feedback"></i>` : ''}
+        </div>
+      `;
+      feedContainer.appendChild(commentDiv);
+    });
+    // attach delete events
+    document.querySelectorAll('.delete-icon').forEach(el => {
+      el.addEventListener('click', async (e) => {
+        const id = el.getAttribute('data-id');
+        if (confirm('Delete this comment permanently?')) {
+          try {
+            deleteComment(id);
+            showToast('Comment deleted', 'success');
+          } catch (err) {
+            showToast(err.message, 'danger');
+          }
+        }
+      });
+    });
+  }
+
+  // helpers
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  function showToast(msg, type = 'danger') {
+    const toastDiv = document.createElement('div');
+    toastDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3 shadow`;
+    toastDiv.style.zIndex = 9999;
+    toastDiv.style.minWidth = '280px';
+    toastDiv.innerHTML = `${msg} <button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+    document.body.appendChild(toastDiv);
+    setTimeout(() => toastDiv.remove(), 3500);
+  }
+
+  // view switching between dashboard, new post, profile
+  function switchView(viewName) {
+    document.querySelectorAll('.view-panel').forEach(panel => panel.style.display = 'none');
+    if (viewName === 'dashboard') document.getElementById('dashboardView').style.display = 'block';
+    else if (viewName === 'newPost') document.getElementById('newPostView').style.display = 'block';
+    else if (viewName === 'profile') document.getElementById('profileView').style.display = 'block';
+    // update active nav style
+    document.querySelectorAll('.list-group-item').forEach(btn => {
+      const target = btn.getAttribute('data-view');
+      if (target === viewName) btn.classList.add('active');
+      else btn.classList.remove('active');
+    });
+    if (viewName === 'dashboard') refreshCommentsFeed();
+  }
+
+  // EVENT LISTENERS
+  document.getElementById('loginForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    try {
+      handleLogin(username, password);
+      showToast(`Welcome back, ${username}!`, 'success');
+      document.getElementById('loginForm').reset();
+    } catch (err) {
+      showToast(err.message, 'danger');
+    }
+  });
+
+  document.getElementById('registerForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const username = document.getElementById('regUsername').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const department = document.getElementById('regDepartment').value;
+    if (!department) { showToast('Please select a department', 'warning'); return; }
+    try {
+      handleRegister(username, password, department);
+      showToast(`Account created! Logged in as ${username}`, 'success');
+      document.getElementById('registerForm').reset();
+      // switch Bootstrap tab to login? not needed because we directly enter app
+    } catch (err) {
+      showToast(err.message, 'danger');
+    }
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    logout();
+    showToast('Logged out successfully', 'info');
+  });
+
+  document.getElementById('profileDetailsForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fullName = document.getElementById('profileFullname').value.trim();
+    const phone = document.getElementById('profilePhone').value.trim();
+    try {
+      updateProfile(fullName, phone);
+      showToast('Profile updated! You can now post feedback.', 'success');
+    } catch (err) {
+      showToast(err.message, 'danger');
+    }
+  });
+
+  document.getElementById('commentForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const category = document.getElementById('commentCategory').value;
+    const content = document.getElementById('commentText').value;
+    try {
+      addComment(category, content);
+      showToast('Feedback posted! Thanks for contributing.', 'success');
+      document.getElementById('commentText').value = '';
+      switchView('dashboard');
+    } catch (err) {
+      showToast(err.message, 'danger');
+      if (err.message.includes('complete your profile')) {
+        switchView('profile');
+      }
+    }
+  });
+
+  // attach sidebar navigation
+  document.querySelectorAll('.list-group-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const view = btn.getAttribute('data-view');
+      if (view) switchView(view);
+    });
+  });
+
+  // initialization
+  initMockData();
+  checkSession();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
